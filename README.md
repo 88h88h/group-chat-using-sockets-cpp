@@ -23,37 +23,6 @@ git clone https://github.com/yourusername/group-chat-using-sockets-cpp.git
 cd group-chat-using-sockets-cpp
 ```
 
-### 
-Memory updated
-Here's a README.md file for your GitHub repository named "group-chat-using-sockets-cpp":
-
-markdown
-Copy code
-# Group Chat Using Sockets in C++
-
-This project implements a simple group chat application using sockets in C++. It includes both server and client programs. Multiple clients can connect to the server and send messages to each other in real-time.
-
-## Features
-
-- **Multi-client support**: Multiple clients can connect to the server simultaneously.
-- **Real-time messaging**: Clients can send and receive messages in real-time.
-- **Threaded handling**: The server uses threads to handle multiple clients concurrently.
-- **Simple command interface**: Clients can send messages and exit the chat using a simple interface.
-
-## Prerequisites
-
-- **C++ compiler**: Make sure you have a C++ compiler installed.
-- **Winsock library**: The application uses the Winsock2 library for socket programming.
-
-## Getting Started
-
-### Clone the Repository
-
-```bash
-git clone https://github.com/yourusername/group-chat-using-sockets-cpp.git
-cd group-chat-using-sockets-cpp
-```
-
 ### Build the Project
 
 Ensure you have Visual Studio or another C++ development environment set up with the Winsock2 library.
