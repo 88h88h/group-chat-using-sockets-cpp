@@ -25,16 +25,19 @@ bool Initialize()
     return WSAStartup(MAKEWORD(2, 2), &data) == 0;
 }
 
-void InteractWithClient(SOCKET clientSocket, vector<SOCKET> &clients) {
+void InteractWithClient(SOCKET clientSocket, vector<SOCKET> &clients)
+{
     // send/recv client
     cout << "client connected" << endl;
 
     char buffer[4096];
 
-    while (1) {
+    while (1)
+    {
         int bytesrecvd = recv(clientSocket, buffer, sizeof(buffer), 0);
 
-        if (bytesrecvd <= 0) {
+        if (bytesrecvd <= 0)
+        {
             cout << "Client disconnected" << endl;
             break;
         }
@@ -42,10 +45,17 @@ void InteractWithClient(SOCKET clientSocket, vector<SOCKET> &clients) {
         string message(buffer, bytesrecvd);
         cout << "Message from client: " << message << endl;
 
-        
-    }
+        for (auto client : clients)
+        {
+            send(client, message.c_str(), static_cast<int>(message.length()), 0);
+        }
 
-    
+        auto it = find(clients.begin(), clients.end(), clientSocket);
+        if (it != clients.end())
+        {
+            clients.erase(it);
+        }
+    }
 
     closesocket(clientSocket);
 }
@@ -83,7 +93,7 @@ int main()
     }
 
     // bind
-    if (bind(listenSocket, reinterpret_cast<sockaddr*>(&serveraddr), sizeof(serveraddr)) == SOCKET_ERROR)
+    if (bind(listenSocket, reinterpret_cast<sockaddr *>(&serveraddr), sizeof(serveraddr)) == SOCKET_ERROR)
     {
         cout << "bind() failed: " << WSAGetLastError() << endl;
         closesocket(listenSocket);
@@ -103,7 +113,8 @@ int main()
     cout << "Listening on port: " << port << endl;
 
     vector<SOCKET> clients;
-    while (1) {
+    while (1)
+    {
         // accept
         SOCKET clientSocket = accept(listenSocket, NULL, NULL);
 
@@ -114,9 +125,9 @@ int main()
 
         clients.push_back(clientSocket);
         thread t1(InteractWithClient, clientSocket, std::ref(clients));
+        t1.detach();
     }
 
-    
     closesocket(listenSocket);
 
     WSACleanup();

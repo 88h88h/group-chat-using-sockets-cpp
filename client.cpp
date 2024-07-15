@@ -1,6 +1,7 @@
 #include <iostream>
 #include <Winsock2.h>
 #include <ws2tcpip.h>
+#include <thread>
 
 using namespace std;
 
@@ -16,6 +17,60 @@ bool Initialize()
 {
     WSADATA data;
     return WSAStartup(MAKEWORD(2, 2), &data) == 0;
+}
+
+void SendMsg(SOCKET s)
+{
+    cout << "Enter your username: ";
+    string name;
+    cin >> name;
+    cout << endl;
+    string message;
+
+    while (1)
+    {
+        cin >> message;
+        string msg = name + " : " + message;
+        int bytesent = send(s, msg.c_str(), static_cast<int>(msg.length()), 0);
+        if (bytesent == SOCKET_ERROR)
+        {
+            cout << "Error sending message " << WSAGetLastError() << endl;
+            break;
+        }
+
+        if (message == "quit")
+        {
+            cout << "Stopping the application" << endl;
+            break;
+        }
+    }
+
+    closesocket(s);
+    WSACleanup();
+}
+
+void ReceiveMsg(SOCKET s)
+{
+    char buffer[4096];
+    int recvlength;
+    string msg = "";
+    while (1)
+    {
+        recvlength = recv(s, buffer, sizeof(buffer), 0);
+        if (recvlength <= 0)
+        {
+            cout << "Disconnected from the server" << endl;
+            break;
+        }
+        else
+        {
+            msg = string(buffer, recvlength);
+            cout << msg << endl;
+        }
+    }
+
+    closesocket(s);
+    WSACleanup();
 }
 
 int main()
@@ -53,18 +108,11 @@ int main()
 
     cout << "Successfully connected to the server" << endl;
 
-    // send/recv
-    string message = "hello there!";
-    int bytesent;
-    bytesent = send(s, message.c_str(), message.length(), 0);
+    thread senderthread(SendMsg, s);
+    thread receivethread(ReceiveMsg, s);
 
-    if (bytesent == SOCKET_ERROR)
-    {
-        cout << "send failed: " << WSAGetLastError() << endl;
-    }
+    senderthread.join();
+    receivethread.join();
 
-    closesocket(s);
-
-    WSACleanup();
     return 0;
 }
